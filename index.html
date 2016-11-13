@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="tableEditorApp" xmlns: xmlns: xmlns:>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Table Editor</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="bower_components/materialize/dist/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="css/app.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body ng-controller="MainCtrl">
+  <ul id="dropdown_menu" class="dropdown-content">
+    <li><a href="#new_table">New</a></li>
+    <li class="divider"></li>
+    <li><a href="#open_file">Open</a></li>
+    <li class="divider"></li>
+    <li><a href="#save_table">Save as...</a></li>
+  </ul>
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper">
+      <a id="logo-container" href="#" class="brand-logo center">Table Editor</a>
+      <a class="dropdown-button left" href="#!" data-activates="dropdown_menu"><i class="material-icons large">menu</i></a>
+      <form>
+        <div class="input-field right">
+          <input id="search" type="search" ng-model="query" required>
+          <label for="search"><i class="material-icons">search</i></label>
+          <i class="material-icons">close</i>
+        </div>
+      </form>
+    </div>
+  </nav>
+
+  <div class="table"></div>
+
+  <div class="container">
+    <div class="section">
+      <table id="table" class="bordered">
+        <tr>
+          <td ng-click="sort(key)" ng-repeat="(key, val) in table[0]" title="Double click to edit">{{key}}</td>
+        </tr>
+        <tr ng-repeat="item in table | orderBy:sortType:reverse | filter:query">
+          <td class="cell" ng-repeat="(key, val) in item" title="Double click to edit">{{val}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="fixed-action-btn toolbar">
+    <a class="btn-floating btn-large orange">
+      <i class="large material-icons">mode_edit</i>
+    </a>
+    <ul>
+      <li class="waves-effect waves-light"><a class="tools" href="#add"><i class="material-icons">add</i>Add</a></li>
+      <li class="waves-effect waves-light"><a class="tools" href="#edit" ng-click="SaveData()"><i class="material-icons">content_paste</i>Edit</a></li>
+      <li class="waves-effect waves-light"><a class="tools" href="#delete"><i class="material-icons">delete</i>Delete</a></li>
+    </ul>
+  </div>
+
+  <div id="new_table" class="modal">
+    <div class="modal-content">
+      <h4>Create table</h4>
+      <div class="row">
+        <div class="input-field col s12">
+          <input id="input_width" type="text" class="validate" ng-model="table_width">
+          <label for="input_width">Input width</label>
+        </div>
+        <div class="input-field col s12">
+          <input id="input_height" type="text" class="validate" ng-model="table_height">
+          <label for="input_height">Input height</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat" ng-click="CreateTable(table_width, table_height)">OK</a>
+      <a href="#" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+    </div>
+  </div>
+
+  <div id="open_file" class="modal">
+    <div class="modal-content">
+      <h4>Open file</h4>
+      <div class="row">
+        <div class="input-field col s12">
+          <input type='file' id="file_open" />
+          <p class="preview"></p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat">OK</a>
+      <a href="#" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+    </div>
+  </div>
+
+  <div id="save_table" class="modal">
+    <div class="modal-content">
+      <h4>Save table as...</h4>
+      <div class="row">
+        <div class="input-field col s12">
+          <input id="input_filename" type="text" class="validate" ng-model="filename">
+          <label for="input_filename">Input filename(with the .json)</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat" ng-click="saveToPc(filename)">OK</a>
+      <a href="#" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+    </div>
+  </div>
+
+  <div id="add" class="modal">
+    <div class="modal-content">
+      <h4>Add</h4>
+      <p>
+        <input type="radio" name="add" id="add_line" />
+        <label for="add_line">Add line</label>
+      </p>
+      <p>
+        <input type="radio" name="add" id="add_column" />
+        <label for="add_column">Add column</label>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat" ng-click="AddData()">OK</a>
+      <a href="#" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+    </div>
+  </div>
+
+  <div id="edit" class="modal">
+    <div class="modal-content">
+      <h4>Edit</h4>
+      <div class="row">
+        <form class="col s12">
+          <div class="row">
+            <div class="input-field col s12">
+              <textarea id="textarea_edit" class="materialize-textarea">{{table | json}}</textarea>
+              <label for="textarea_edit">TextArea</label>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat" ng-click="UpdateTableFromTextArea()">OK</a>
+      <a href="#" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+    </div>
+  </div>
+
+  <div id="delete" class="modal">
+    <div class="modal-content">
+      <h4>Delete</h4>
+      <p>
+        <input type="radio" name="delete" id="delete_line" />
+        <label for="delete_line">Delete line</label>
+      </p>
+      <p>
+        <div class="input-field col s12">
+          <input id="delete_name_line" type="text" class="validate" disabled>
+          <label for="delete_name_line">Input the line number</label>
+        </div>
+      </p>
+      <p>
+        <input type="radio" name="delete" id="delete_column" />
+        <label for="delete_column">Delete column</label>
+      </p>
+      <p>
+        <div class="input-field col s12">
+          <input id="delete_header_column" type="text" class="validate" disabled>
+          <label for="delete_header_column">Input the column number</label>
+        </div>
+      </p>
+    </div>
+    <div class="modal-footer">
+      <a href="#" class="modal-action modal-close waves-effect waves-green btn-flat" ng-click="DeleteData()">OK</a>
+      <a href="#" class="modal-action modal-close waves-effect waves-red btn-flat">Cancel</a>
+    </div>
+  </div>
+
+  <!--  Scripts-->
+  <script src="bower_components/jquery/dist/jquery.js"></script>
+  <script src="bower_components/materialize/dist/js/materialize.js"></script>
+
+  <!-- Angular.js core JavaScript
+================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="bower_components/angular/angular.js"></script>
+  <!--Angular.js Route-->
+  <script src="bower_components/angular-route/angular-route.js"></script>
+  <!--Angular.js Resource-->
+  <script src="bower_components/angular-resource/angular-resource.js"></script>
+
+  <script src="js/jquery.tabletojson.js"></script>
+  <script src="js/controllers.js"></script>
+  <script src="js/init.js"></script>
+  <script src="js/app.js"></script>
+
+  </body>
+</html>

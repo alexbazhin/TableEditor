@@ -1,0 +1,42 @@
+body {
+  background-color: #f1f1f1;
+}
+
+.container {
+  //background-color: #ffffff;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.open_file {
+  display: none;
+}
+
+.icon-block {
+  padding: 0 15px;
+}
+.icon-block .material-icons {
+  font-size: inherit;
+}
+
+.dropdown-button {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.dropdown-content {
+  min-width: 156px;
+}
+
+.tools {
+  font-size: 1.5em;
+  vertical-align: middle;
+}
+
+.material-icons {
+  vertical-align: middle;
+}
+
+#edit_cell {
+  width: 50px;
+}
